@@ -14,6 +14,9 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.enums import TA_CENTER
 
+from dotenv import load_dotenv
+load_dotenv()
+
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -87,7 +90,7 @@ class App(ctk.CTk):
         self.state("zoomed")   # start maximized
 
         self.db = dict(host="localhost", user="root",
-                       password="root", database="MPM_DB")
+                       password=os.getenv("DB_PASSWORD"), database="MPM_DB")
         self.pdf = PDF(self.db)
         self.role    = None
         self.me      = None
