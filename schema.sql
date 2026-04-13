@@ -1,0 +1,118 @@
+mysql:
+
+DROP DATABASE IF EXISTS MPM_DB;
+CREATE DATABASE MPM_DB;
+USE MPM_DB;
+
+CREATE TABLE USERS(
+  Uid INT PRIMARY KEY AUTO_INCREMENT,
+  Username VARCHAR(30) UNIQUE,
+  Password VARCHAR(255),
+  Role VARCHAR(20),
+  Active TINYINT(1) DEFAULT 1
+);
+
+INSERT INTO USERS (Username, Password, Role) VALUES
+('admin123','admin56','admin'),
+('manager123','manag46','manager');
+
+CREATE TABLE SUPPLIERS (
+  Sid INT PRIMARY KEY AUTO_INCREMENT,
+  Name VARCHAR(50),
+  Contact VARCHAR(30)
+);
+
+INSERT INTO SUPPLIERS (Name, Contact) VALUES
+('TimberCo','9876543210'),
+('GlueMart','9123456789');
+
+CREATE TABLE RAW_MATERIALS(
+  Rid INT PRIMARY KEY AUTO_INCREMENT,
+  Name VARCHAR(40),
+  Stock_level INT,
+  Unit VARCHAR(20),
+  reorder_point INT DEFAULT 20,
+  Sid INT,
+  FOREIGN KEY (Sid) REFERENCES SUPPLIERS(Sid)
+);
+
+INSERT INTO RAW_MATERIALS (Name, Stock_level, Unit, Sid) VALUES
+('Steel',150,'kg',1),
+('Nails',500,'pieces',1),
+('Paint',80,'litres',2),
+('Foam',60,'kg',2);
+
+CREATE TABLE PRODUCTS(
+  Pid INT PRIMARY KEY AUTO_INCREMENT,
+  Name VARCHAR(40),
+  Price INT,
+  Quantity INT DEFAULT 0
+);
+
+INSERT INTO PRODUCTS (Name, Price, Quantity) VALUES
+('Table',40000,0),
+('Chair',5000,0),
+('Desk',15000,0),
+('Cupboard',30000,0),
+('Sofa',50000,0);
+
+CREATE TABLE BOM (
+  Bid INT PRIMARY KEY AUTO_INCREMENT,
+  Pid INT,
+  Rid INT,
+  Qty_required DECIMAL(10,2),
+  FOREIGN KEY (Pid) REFERENCES PRODUCTS(Pid),
+  FOREIGN KEY (Rid) REFERENCES RAW_MATERIALS(Rid)
+);
+
+INSERT INTO BOM (Pid, Rid, Qty_required) VALUES
+(1,1,5),
+(1,2,1),
+(2,1,2),
+(2,2,0.5),
+(3,1,10),
+(3,2,2),
+(4,1,15),
+(4,3,2),
+(5,4,5),
+(5,3,1);
+
+CREATE TABLE PRODUCTION_LOG(
+  PLid INT PRIMARY KEY AUTO_INCREMENT,
+  Pid INT,
+  Timestamp DATE,
+  Quantity INT,
+  Uid INT,
+  FOREIGN KEY (Pid) REFERENCES PRODUCTS(Pid) ON DELETE CASCADE,
+  FOREIGN KEY (Uid) REFERENCES USERS(Uid)
+);
+
+INSERT INTO PRODUCTION_LOG (Pid, Timestamp, Quantity, Uid) VALUES
+(1,'2025-04-01',5,1),
+(2,'2025-04-02',10,1),
+(3,'2025-04-03',3,1),
+(4,'2025-04-04',2,1),
+(5,'2025-04-05',1,1);
+
+UPDATE PRODUCTS SET Quantity = Quantity + 5 WHERE Pid=1;
+UPDATE PRODUCTS SET Quantity = Quantity + 10 WHERE Pid=2;
+UPDATE PRODUCTS SET Quantity = Quantity + 3 WHERE Pid=3;
+UPDATE PRODUCTS SET Quantity = Quantity + 2 WHERE Pid=4;
+UPDATE PRODUCTS SET Quantity = Quantity + 1 WHERE Pid=5;
+
+CREATE TABLE SALES_LOG (
+  Slid INT PRIMARY KEY AUTO_INCREMENT,
+  Pid INT,
+  Timestamp DATE,
+  Quantity INT,
+  FOREIGN KEY (Pid) REFERENCES PRODUCTS(Pid) ON DELETE CASCADE
+);
+
+INSERT INTO SALES_LOG (Pid, Timestamp, Quantity) VALUES
+(1,'2025-04-06',2),
+(2,'2025-04-07',5),
+(3,'2025-04-08',1);
+
+UPDATE PRODUCTS SET Quantity = Quantity - 2 WHERE Pid=1;
+UPDATE PRODUCTS SET Quantity = Quantity - 5 WHERE Pid=2;
+UPDATE PRODUCTS SET Quantity = Quantity - 1 WHERE Pid=3;
