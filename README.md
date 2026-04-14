@@ -60,7 +60,3 @@ python frontend/app.py
 ![Charts](Assets/charts.png)
 
 ---
-
-##  Author
-
-Abhinav Ajayakumar
